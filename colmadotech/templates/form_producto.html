@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}{% if producto %}Editar{% else %}Nuevo{% endif %} Producto — ColmadoTech{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">{% if producto %}Editar Producto{% else %}Nuevo Producto{% endif %}</div>
+        <div class="page-subtitle">{% if producto %}Modifica los datos del producto{% else %}Agrega un producto al inventario{% endif %}</div>
+    </div>
+    <a href="{{ url_for('productos') }}" class="btn btn-ghost">← Volver</a>
+</div>
+
+<div style="max-width: 600px;">
+    <div class="card">
+        <form method="POST">
+            <div class="form-group">
+                <label class="form-label">Nombre del Producto *</label>
+                <input type="text" name="nombre" class="form-control" required
+                    value="{{ producto.nombre if producto else '' }}"
+                    placeholder="Ej: Arroz Cristal 5lb">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Categoría *</label>
+                <select name="categoria" class="form-control" required>
+                    <option value="">Selecciona...</option>
+                    {% set cats = ['Granos', 'Aceites', 'Embutidos', 'Bebidas', 'Lácteos', 'Panadería', 'Limpieza', 'Higiene', 'Snacks', 'Otros'] %}
+                    {% for cat in cats %}
+                    <option value="{{ cat }}" {% if producto and producto.categoria == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Precio de Compra (RD$) *</label>
+                    <input type="number" step="0.01" name="precio_compra" class="form-control" required
+                        value="{{ producto.precio_compra if producto else '' }}"
+                        placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Precio de Venta (RD$) *</label>
+                    <input type="number" step="0.01" name="precio_venta" class="form-control" required
+                        value="{{ producto.precio_venta if producto else '' }}"
+                        placeholder="0.00">
+                </div>
+            </div>
+
+            {% if not producto %}
+            <div class="form-group">
+                <label class="form-label">Cantidad inicial en stock *</label>
+                <input type="number" name="cantidad" class="form-control" required min="0"
+                    placeholder="Ej: 20">
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label">Cantidad mínima (alerta de stock bajo) *</label>
+                <input type="number" name="cantidad_minima" class="form-control" required min="1"
+                    value="{{ producto.cantidad_minima if producto else '5' }}"
+                    placeholder="Ej: 5">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Fecha de Vencimiento (opcional)</label>
+                <input type="date" name="fecha_vencimiento" class="form-control"
+                    value="{{ producto.fecha_vencimiento if producto else '' }}">
+            </div>
+
+            <div class="flex gap-3 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    {% if producto %}💾 Guardar Cambios{% else %}✅ Agregar Producto{% endif %}
+                </button>
+                <a href="{{ url_for('productos') }}" class="btn btn-ghost">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

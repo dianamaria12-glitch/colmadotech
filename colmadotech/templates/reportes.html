@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Reportes — ColmadoTech{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">Reportes</div>
+        <div class="page-subtitle">Análisis de tu inventario y movimientos</div>
+    </div>
+</div>
+
+<div class="grid-2" style="margin-bottom:24px;">
+    <!-- Por categoría -->
+    <div class="card">
+        <div class="card-title">📦 Inventario por Categoría</div>
+        <table style="border:none;">
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Productos</th>
+                    <th>Stock Total</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in por_categoria %}
+                <tr>
+                    <td><span class="badge badge-blue">{{ c.categoria }}</span></td>
+                    <td>{{ c.total }}</td>
+                    <td>{{ c.stock }}</td>
+                    <td class="text-green">RD${{ "%.0f"|format(c.valor) }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-muted">Sin datos</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Más salidas -->
+    <div class="card">
+        <div class="card-title">🏆 Productos con Más Salidas</div>
+        {% if mas_vendidos %}
+        {% for i, p in enumerate(mas_vendidos) if i is defined %}
+        {% endfor %}
+        <table style="border:none;">
+            <thead>
+                <tr><th>#</th><th>Producto</th><th>Unidades salidas</th></tr>
+            </thead>
+            <tbody>
+                {% for p in mas_vendidos %}
+                <tr>
+                    <td class="text-muted">{{ loop.index }}</td>
+                    <td>{{ p.nombre }}</td>
+                    <td><span class="badge badge-green">{{ p.total }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" class="text-muted">Sin movimientos aún</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted" style="font-size:0.88rem;">Registra movimientos de salida para ver estadísticas</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Historial completo -->
+<div class="card">
+    <div class="card-title">🔄 Historial de Movimientos (últimos 30)</div>
+    <div class="table-wrapper" style="border:none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Producto</th>
+                    <th>Tipo</th>
+                    <th>Cantidad</th>
+                    <th>Nota</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in historial %}
+                <tr>
+                    <td class="text-muted" style="font-size:0.8rem;">{{ m.fecha[:16] }}</td>
+                    <td>{{ m.nombre }}</td>
+                    <td>
+                        {% if m.tipo == 'entrada' %}
+                        <span class="badge badge-green">↑ Entrada</span>
+                        {% else %}
+                        <span class="badge badge-red">↓ Salida</span>
+                        {% endif %}
+                    </td>
+                    <td class="font-bold">{{ m.cantidad }}</td>
+                    <td class="text-muted">{{ m.nota or '—' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">No hay movimientos aún</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

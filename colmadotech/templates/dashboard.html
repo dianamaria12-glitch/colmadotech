@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — ColmadoTech{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Resumen general de tu colmado</div>
+    </div>
+    <a href="{{ url_for('nuevo_producto') }}" class="btn btn-primary">+ Nuevo Producto</a>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Productos</div>
+        <div class="stat-value green">{{ total_productos }}</div>
+        <div class="text-muted" style="font-size:0.8rem;">en inventario</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Stock Bajo</div>
+        <div class="stat-value {% if stock_bajo > 0 %}red{% else %}green{% endif %}">{{ stock_bajo }}</div>
+        <div class="text-muted" style="font-size:0.8rem;">productos bajo mínimo</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Valor Inventario</div>
+        <div class="stat-value" style="font-size:1.4rem;">RD${{ "%.0f"|format(valor_inventario) }}</div>
+        <div class="text-muted" style="font-size:0.8rem;">costo total en stock</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Ganancia Potencial</div>
+        <div class="stat-value green" style="font-size:1.4rem;">RD${{ "%.0f"|format(ganancia_potencial) }}</div>
+        <div class="text-muted" style="font-size:0.8rem;">si se vende todo</div>
+    </div>
+</div>
+
+<div class="grid-2" style="margin-bottom: 24px;">
+    <!-- Alertas de stock -->
+    <div class="card">
+        <div class="card-title">⚠️ Alertas de Stock Bajo</div>
+        {% if alertas %}
+        <table style="border:none;">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Stock</th>
+                    <th>Mínimo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in alertas %}
+                <tr>
+                    <td>{{ p.nombre }}</td>
+                    <td><span class="badge badge-red">{{ p.cantidad }}</span></td>
+                    <td class="text-muted">{{ p.cantidad_minima }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted" style="font-size:0.88rem;">✅ Todo el inventario está bien surtido</p>
+        {% endif %}
+    </div>
+
+    <!-- Próximos a vencer -->
+    <div class="card">
+        <div class="card-title">📅 Próximos a Vencer (30 días)</div>
+        {% if proximos_vencer %}
+        <table style="border:none;">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Vence</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in proximos_vencer %}
+                <tr>
+                    <td>{{ p.nombre }}</td>
+                    <td><span class="badge badge-yellow">{{ p.fecha_vencimiento }}</span></td>
+                    <td>{{ p.cantidad }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted" style="font-size:0.88rem;">✅ No hay productos próximos a vencer</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Movimientos recientes -->
+<div class="card">
+    <div class="card-title">🔄 Últimos Movimientos</div>
+    {% if movimientos_recientes %}
+    <div class="table-wrapper" style="border:none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Tipo</th>
+                    <th>Cantidad</th>
+                    <th>Nota</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in movimientos_recientes %}
+                <tr>
+                    <td>{{ m.nombre }}</td>
+                    <td>
+                        {% if m.tipo == 'entrada' %}
+                        <span class="badge badge-green">↑ Entrada</span>
+                        {% else %}
+                        <span class="badge badge-red">↓ Salida</span>
+                        {% endif %}
+                    </td>
+                    <td class="font-bold">{{ m.cantidad }}</td>
+                    <td class="text-muted">{{ m.nota or '—' }}</td>
+                    <td class="text-muted" style="font-size:0.8rem;">{{ m.fecha[:16] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted" style="font-size:0.88rem;">No hay movimientos aún</p>
+    {% endif %}
+</div>
+{% endblock %}

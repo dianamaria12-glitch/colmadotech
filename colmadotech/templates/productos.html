@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Inventario — ColmadoTech{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">Inventario</div>
+        <div class="page-subtitle">Gestiona todos tus productos</div>
+    </div>
+    <a href="{{ url_for('nuevo_producto') }}" class="btn btn-primary">+ Nuevo Producto</a>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <form method="GET" style="display:flex; gap:12px; align-items:flex-end;">
+        <div style="flex:1;">
+            <label class="form-label">Buscar producto</label>
+            <input type="text" name="buscar" class="form-control" placeholder="Ej: arroz, aceite..." value="{{ buscar }}">
+        </div>
+        <div style="width:200px;">
+            <label class="form-label">Categoría</label>
+            <select name="categoria" class="form-control">
+                <option value="">Todas</option>
+                {% for c in categorias %}
+                <option value="{{ c.categoria }}" {% if c.categoria == categoria_sel %}selected{% endif %}>{{ c.categoria }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-ghost">🔍 Filtrar</button>
+        <a href="{{ url_for('productos') }}" class="btn btn-ghost">✕ Limpiar</a>
+    </form>
+</div>
+
+<!-- Tabla -->
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>P. Compra</th>
+                <th>P. Venta</th>
+                <th>Stock</th>
+                <th>Estado</th>
+                <th>Vencimiento</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in productos %}
+            <tr>
+                <td class="font-bold">{{ p.nombre }}</td>
+                <td><span class="badge badge-blue">{{ p.categoria }}</span></td>
+                <td class="text-muted">RD${{ "%.0f"|format(p.precio_compra) }}</td>
+                <td class="text-green font-bold">RD${{ "%.0f"|format(p.precio_venta) }}</td>
+                <td class="font-bold">{{ p.cantidad }}</td>
+                <td>
+                    {% if p.cantidad == 0 %}
+                    <span class="badge badge-red">Agotado</span>
+                    {% elif p.cantidad <= p.cantidad_minima %}
+                    <span class="badge badge-yellow">Stock bajo</span>
+                    {% else %}
+                    <span class="badge badge-green">OK</span>
+                    {% endif %}
+                </td>
+                <td class="text-muted" style="font-size:0.82rem;">{{ p.fecha_vencimiento or '—' }}</td>
+                <td>
+                    <div class="flex gap-2">
+                        <button onclick="abrirMovimiento({{ p.id }}, '{{ p.nombre }}')" class="btn btn-ghost btn-sm">± Mover</button>
+                        <a href="{{ url_for('editar_producto', id=p.id) }}" class="btn btn-ghost btn-sm">✏️</a>
+                        <form method="POST" action="{{ url_for('eliminar_producto', id=p.id) }}" onsubmit="return confirm('¿Eliminar este producto?')">
+                            <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" style="text-align:center; padding:40px; color:var(--text-muted);">
+                    No se encontraron productos
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal movimiento -->
+<div class="modal-overlay" id="modalMovimiento">
+    <div class="modal">
+        <h3>📦 Registrar Movimiento</h3>
+        <p class="text-muted mb-4" id="modalNombreProducto" style="font-size:0.88rem;"></p>
+        <form method="POST" id="formMovimiento">
+            <div class="form-group">
+                <label class="form-label">Tipo</label>
+                <select name="tipo" class="form-control" required>
+                    <option value="entrada">↑ Entrada (compra/recepción)</option>
+                    <option value="salida">↓ Salida (venta/uso)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cantidad</label>
+                <input type="number" name="cantidad" class="form-control" min="1" required placeholder="Ej: 10">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nota (opcional)</label>
+                <input type="text" name="nota" class="form-control" placeholder="Ej: Compra a proveedor, venta...">
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button type="submit" class="btn btn-primary">Registrar</button>
+                <button type="button" onclick="cerrarModal()" class="btn btn-ghost">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function abrirMovimiento(id, nombre) {
+    document.getElementById('formMovimiento').action = '/movimiento/' + id;
+    document.getElementById('modalNombreProducto').textContent = 'Producto: ' + nombre;
+    document.getElementById('modalMovimiento').classList.add('open');
+}
+function cerrarModal() {
+    document.getElementById('modalMovimiento').classList.remove('open');
+}
+document.getElementById('modalMovimiento').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModal();
+});
+</script>
+{% endblock %}

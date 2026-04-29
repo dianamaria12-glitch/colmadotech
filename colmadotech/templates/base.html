@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ColmadoTech{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --verde: #00C851;
+            --verde-dark: #009c3f;
+            --verde-light: #e6fff0;
+            --rojo: #ff4444;
+            --amarillo: #ffbb33;
+            --bg: #0d1117;
+            --bg2: #161b22;
+            --bg3: #21262d;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #7d8590;
+            --card: #161b22;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+        /* SIDEBAR */
+        .sidebar {
+            width: 240px;
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+        .sidebar-logo {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-logo h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--verde);
+            letter-spacing: -0.5px;
+        }
+        .sidebar-logo span {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 2px;
+        }
+        .sidebar-nav {
+            padding: 16px 12px;
+            flex: 1;
+        }
+        .nav-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 8px 8px 6px;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 2px;
+            transition: all 0.15s;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: var(--bg3);
+            color: var(--text);
+        }
+        .nav-link.active { color: var(--verde); }
+        .nav-icon { font-size: 1.1rem; width: 20px; text-align: center; }
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        /* MAIN */
+        .main {
+            margin-left: 240px;
+            flex: 1;
+            padding: 32px;
+            max-width: calc(100vw - 240px);
+        }
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+        .page-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 2px; }
+        /* CARDS */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        /* STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 6px 0 2px;
+            line-height: 1;
+        }
+        .stat-value.green { color: var(--verde); }
+        .stat-value.red { color: var(--rojo); }
+        .stat-value.yellow { color: var(--amarillo); }
+        /* TABLE */
+        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            background: var(--bg3);
+            padding: 12px 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: left;
+        }
+        tbody tr { border-top: 1px solid var(--border); transition: background 0.1s; }
+        tbody tr:hover { background: var(--bg3); }
+        td { padding: 12px 16px; font-size: 0.88rem; }
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .badge-green { background: rgba(0,200,81,0.15); color: var(--verde); }
+        .badge-red { background: rgba(255,68,68,0.15); color: var(--rojo); }
+        .badge-yellow { background: rgba(255,187,51,0.15); color: var(--amarillo); }
+        .badge-blue { background: rgba(88,166,255,0.15); color: #58a6ff; }
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: all 0.15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-primary { background: var(--verde); color: #000; }
+        .btn-primary:hover { background: var(--verde-dark); }
+        .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: var(--bg3); color: var(--text); }
+        .btn-danger { background: rgba(255,68,68,0.15); color: var(--rojo); border: 1px solid rgba(255,68,68,0.3); }
+        .btn-danger:hover { background: var(--rojo); color: #fff; }
+        .btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+        /* FORMS */
+        .form-group { margin-bottom: 18px; }
+        .form-label { display: block; font-size: 0.82rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+        .form-control {
+            width: 100%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.15s;
+        }
+        .form-control:focus { outline: none; border-color: var(--verde); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        /* ALERTS */
+        .flash-messages { margin-bottom: 20px; }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            margin-bottom: 8px;
+        }
+        .alert-success { background: rgba(0,200,81,0.12); border: 1px solid rgba(0,200,81,0.3); color: var(--verde); }
+        .alert-danger { background: rgba(255,68,68,0.12); border: 1px solid rgba(255,68,68,0.3); color: var(--rojo); }
+        .alert-info { background: rgba(88,166,255,0.12); border: 1px solid rgba(88,166,255,0.3); color: #58a6ff; }
+        /* MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            width: 380px;
+            max-width: 95vw;
+        }
+        .modal h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; margin-bottom: 18px; }
+        /* GRID */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        /* UTILITIES */
+        .text-muted { color: var(--text-muted); }
+        .text-green { color: var(--verde); }
+        .text-red { color: var(--rojo); }
+        .text-yellow { color: var(--amarillo); }
+        .mt-4 { margin-top: 16px; }
+        .mb-4 { margin-bottom: 16px; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .gap-2 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .justify-between { justify-content: space-between; }
+        .font-bold { font-weight: 700; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>🛒 ColmadoTech</h1>
+            <span>Sistema de Inventario</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Principal</div>
+            <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}">
+                <span class="nav-icon">📊</span> Dashboard
+            </a>
+            <a href="{{ url_for('productos') }}" class="nav-link {% if 'producto' in request.endpoint %}active{% endif %}">
+                <span class="nav-icon">📦</span> Inventario
+            </a>
+            <a href="{{ url_for('reportes') }}" class="nav-link {% if request.endpoint=='reportes' %}active{% endif %}">
+                <span class="nav-icon">📈</span> Reportes
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            ColmadoTech S.R.L. v1.0<br>
+            <span style="color: var(--verde);">● Sistema activo</span>
+        </div>
+    </aside>
+
+    <main class="main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for cat, msg in messages %}
+            <div class="alert alert-{{ cat }}">{{ msg }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
